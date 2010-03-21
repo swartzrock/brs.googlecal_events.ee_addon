@@ -28,7 +28,7 @@ Zend_Loader::loadClass('Zend_Gdata_Calendar');
  */
 class Googlecal_events {
 	
-	const DEFAULT_MAX_CACHE_AGE 		= 900; // default 15 minute - max cache age
+	const DEFAULT_MAX_CACHE_AGE 		= 900; // default: cache events for 15 minutes
 	const CACHE_DIR_NAME				= "googlecal_events_cache";
 	
 	const START_DAY_VAR 				= "start_day";
@@ -105,6 +105,7 @@ class Googlecal_events {
 	}
 	
 	
+	// Get a {googlecal_events} param, or return the defaultValue if not present
 	function getParamOrDefault($paramName, $defaultValue) {
 		global $TMPL;
 		$param = $TMPL->fetch_param( $paramName );
@@ -112,10 +113,14 @@ class Googlecal_events {
 		return $param;
 	}
 	
+	
+	// Get a {googlecal_events} param or '' if the param wasn't found
 	function getParam($paramName) {
 		return $this->getParamOrDefault( $paramName, '' );
 	}
 	
+	
+	// Log a message to EE and to the PHP error log
 	function log($msg) {
 		global $TMPL;
 		$TMPL->log_item( $msg );
@@ -123,14 +128,11 @@ class Googlecal_events {
 	}
 	
 	
-	
-	
 	// Load the events from the google calendars
 	function loadEvents() {
 
 		$this->readCachedEvents();
 		if ( $this->events ) {
-			$this->log( "Read events from cache!" );
 			return;
 		}
 		
@@ -139,7 +141,7 @@ class Googlecal_events {
 	}
 
 	
-	
+	// Parse the event feed from the Gdata API
 	function parseEventFeed($eventFeed) {
 		
 		$events = array();
@@ -245,13 +247,6 @@ class Googlecal_events {
 			}
 		}
 		
-		// Otherwise clean up the now-obsolete cache files in the directory 
-		// else {
-		// 	foreach(glob($this->cacheDir . "*") as $file) {
-		// 		unlink($file);
-		// 	}
-		// }
-
 		$cacheFileName = $this->cacheDir . $this->createCacheKey();
 		
 		$fp = @fopen($cacheFileName, "wb");
@@ -271,18 +266,16 @@ class Googlecal_events {
 		}
 
 	}
-
+	
+	
+	// Create the unique key for this cache
 	function createCacheKey() {
 		$calendars = implode( ",", $this->google_calendars );
 		return md5( "{$this->calendar_start_date}__{$this->calendar_end_date}__{$calendars}" );
 	}
 	
 	
-	
-	
-	
-	
-	
+	// Create a map from the specifc date format tag to a list of the date format tags it contains
 	function buildDateFormatTagToDateParamMap($tagName) {
 		
 		global $TMPL, $LOC;
@@ -307,7 +300,7 @@ class Googlecal_events {
 	
 	
 	
-	
+	// Render the events in this template
 	function renderEvents() {
 		
 		global $TMPL, $LOC, $SESS;
