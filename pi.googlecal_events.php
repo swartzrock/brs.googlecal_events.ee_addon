@@ -59,11 +59,11 @@ class Googlecal_events {
 	
 	
 	
-	
 	// Constructor for Googlecal_events class
 	function Googlecal_events()
 	{
 		global $TMPL;
+		ob_start(); 
 		
 		$this->cacheDir = PATH_CACHE . Googlecal_events::CACHE_DIR_NAME . "/";
 		
@@ -78,6 +78,13 @@ class Googlecal_events {
 	function parseInputParams() {
 		
 		global $TMPL;
+		
+		
+		$param = $TMPL->fetch_param( "paramName" );
+		if ( $param == FALSE ) { $this->log("param is false!"); }
+		
+		
+		
 		
 		// Get the required params
 		$google_calendars_param = $this->getParam( "google_calendars" );
@@ -101,7 +108,7 @@ class Googlecal_events {
 		
 		// Get the optional params
 		$this->max_cache_age = $this->getParamOrDefault( "max_cache_age", Googlecal_events::DEFAULT_MAX_CACHE_AGE );
-		
+		$this->log( "max_cache_age param = " . $this->getParamOrDefault( "max_cache_age", "nada") );
 	}
 	
 	
@@ -109,6 +116,7 @@ class Googlecal_events {
 	function getParamOrDefault($paramName, $defaultValue) {
 		global $TMPL;
 		$param = $TMPL->fetch_param( $paramName );
+		// $this->log( "getParam(" . $paramName . ") = " . $param );
 		if ($param == FALSE) { $param = $defaultValue; }
 		return $param;
 	}
@@ -147,6 +155,12 @@ class Googlecal_events {
 		$events = array();
 		
 		foreach ($eventFeed as $event) {
+			
+			// Ignore cancelled events
+			if ( $event->eventStatus == "http://schemas.google.com/g/2005#event.canceled" ) {
+				continue;
+			}
+			
 			$name = $event->title;
 			$where = $event->where[0];
 			$description = $event->content;
@@ -159,7 +173,6 @@ class Googlecal_events {
 		
 		return $events;	
 	}
-	
 	
 	
 	// Read the events from the feed
@@ -204,7 +217,6 @@ class Googlecal_events {
 	}
 	
 	
-	
 	// Read the events from a file cache
 	function readCachedEvents() {
 		
@@ -221,6 +233,9 @@ class Googlecal_events {
 		if ( $cacheAge > $this->max_cache_age ) {
 			return;
 		}
+		
+		$this->log("Cache age (" . $cacheAge . ") is not bigger than " . $this->max_cache_age);
+		
 
 		$fp = fopen($cacheFileName, "rb");
 		if ( ! $fp ) {
@@ -297,7 +312,6 @@ class Googlecal_events {
 		
 		return $result;
 	}
-	
 	
 	
 	// Render the events in this template
@@ -423,12 +437,10 @@ class Googlecal_events {
 				
 			}
 			
-			
 			$output .= $tagdata;
 		}
 		$this->return_data = $output;
 	}
-	
 	
 
 	
