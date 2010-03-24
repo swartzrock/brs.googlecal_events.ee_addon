@@ -449,7 +449,35 @@ class Googlecal_events {
 	function usage()
 	{
 		ob_start(); 
-		?>
+		
+?>------------------
+DESCRIPTION
+------------------
+The {exp:googlecal_events} tag.... ... .. TBD
+
+
+------------------
+PARAMETERS
+------------------
+google_calendars
+- The google calendars to display, formatted as a comma-delimited list of calendar id's.
+- Example: google_calendars="12345@group.calendar.google.com,67890@group.calendar.google.com"
+
+user = ""
+- The user id of the Google API-Enabled account to use
+- Example: gdataApiUser@gmail.com
+
+password = ""
+- The password of the Google API-Enabled account to use
+
+num_days = ""
+- The number of days to display, starting from the current date.
+
+max_cache_age = ""  [OPTIONAL]
+- The maximum time in seconds to cache the calendar feed locally
+- If not specified, the default time of 15 minutes will be used
+
+
 		------------------
 		EXAMPLE USAGE:
 		------------------
@@ -550,10 +578,6 @@ function eventCmp($event1, $event2) {
 	}
 	return $event1->startTime - $event2->startTime;
 }
-
-
-
-
 
 
 
