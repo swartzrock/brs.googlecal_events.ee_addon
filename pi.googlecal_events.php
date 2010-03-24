@@ -453,38 +453,63 @@ class Googlecal_events {
 		------------------
 		EXAMPLE USAGE:
 		------------------
-		
-		{exp:googlecal_events google_calendars="" user="" password="" num_days="" }
-		<div class="day">{start_day format="%I, %M %d %Y"}</div>
+		{exp:googlecal_events google_calendars="..." user="..." password="..." num_days="..." }
 		{start_time format="%g:%i %a"}: {what} ({where})<br>
+		{/exp:googlecal_events}
+		
+		{exp:googlecal_events google_calendars="..." user="..." password="..." num_days="..." }
+		{start_day}<div class="day">{start_day_format format="%l, %F %j %Y"}</div>{/start_day}
+		{start_time format="%g:%i %a"}: {what} ({where})<br>
+		{description}<br>
 		{/exp:googlecal_events}
 		
 		------------------
 		PARAMETERS:
 		------------------
 		google_calendars=""
-		- The google calendar to use, described on Google's site as a "user"
+		- The google calendars to display, formatted as a comma-delimited list of calendar id's.
+		- Example: google_calendars="db6v89hrjqi72ht6mjfcacij80@group.calendar.google.com"
+		- Example: google_calendars="db6v89hrjqi72ht6mjfcacij80@group.calendar.google.com,5aa42b61ffhjubloa703tkes48@group.calendar.google.com"
+		
 		
 		user = ""
+		- The user id of the Google API-Enabled account to use
+		- Example: gdataApiUser@gmail.com
 		
 		password = ""
+		- The password of the Google API-Enabled account to use
 		
 		num_days = ""
+		- The number of days to display, starting from the current date.
 		
-		max_cache_age = ""
-		{start_day}<div class="day">{start_day_format format="%l, %M %j %Y"}</div>{/start_day}
-		{start_time format="%g:%i %a"}<br>
+		max_cache_age = ""  [OPTIONAL]
+		- The maximum time in seconds to cache the calendar feed locally
+		- If not specified, the default time of 15 minutes will be used
 		
 		------------------
 		VARIABLES:
 		------------------
-		{start_day}
-		{start_time}
-		{end_time}
+		{start_day format="<date format tags>"}
+		- Displays the start time of the event formatted using EE date tags
+		- Only appears once a day for the first event each day
+		- Makes it possible to show a single Day header for multiple events (see second example above)
+		
+		{start_time format="<date format tags>"}
+		- Displays the start time of the event formatted using EE date tags
+		- Unlike start_day, appears for every event
+		- Example: use start_day to show the date and start_time to show the start time
+		
+		{end_time format="<date format tags>"}
+		- Displays the end time of the event formatted using EE date tags
+		
 		{what}
+		- Displays the "what" field of the event, aka the event title
+		
 		{where}
+		- Displays the "where" field of the event
+		
 		{description}
-
+		- Displays the full description of the event
 
 		<?php
 		$buffer = ob_get_flush();
