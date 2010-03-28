@@ -9,14 +9,6 @@ $plugin_info = array(
 	'pi_usage'			=> Googlecal_events::usage()
 );
 
-// Add the Zend Google Data API
-require_once 'Zend/Loader.php';
-Zend_Loader::loadClass('Zend_Gdata');
-Zend_Loader::loadClass('Zend_Gdata_AuthSub');
-Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
-Zend_Loader::loadClass('Zend_Gdata_HttpClient');
-Zend_Loader::loadClass('Zend_Gdata_Calendar');
-
 					
 /**
  * Googlecal_events Class
@@ -63,15 +55,36 @@ class Googlecal_events {
 	function Googlecal_events()
 	{
 		global $TMPL;
-		ob_start(); 
+		
+		// Load the Zend Google Data API
+		include_once 'Zend/Loader.php';
+		if( ! class_exists("Zend_Loader") ) {
+			$this->log( "Error: Zend GData API not found, unable to load events (pi.googlecal_events).");
+			return;
+		}
+		
+		Zend_Loader::loadClass('Zend_Gdata');
+		Zend_Loader::loadClass('Zend_Gdata_AuthSub');
+		Zend_Loader::loadClass('Zend_Gdata_ClientLogin');
+		Zend_Loader::loadClass('Zend_Gdata_HttpClient');
+		Zend_Loader::loadClass('Zend_Gdata_Calendar');
+		
 		
 		$this->cacheDir = PATH_CACHE . Googlecal_events::CACHE_DIR_NAME . "/";
 		
-		$this->parseInputParams();
+		$success = $this->parseInputParams();
+		if (! $success) {
+			return;
+		}
+		
 		$this->loadEvents();
+		if ( $this->events == null ) {
+			return;
+		}
 		
 		$this->renderEvents();
 	}
+	
 	
 	
 	// Parse the input parameters into class fields
@@ -80,23 +93,20 @@ class Googlecal_events {
 		global $TMPL;
 		
 		
-		$param = $TMPL->fetch_param( "paramName" );
-		if ( $param == FALSE ) { $this->log("param is false!"); }
-		
-		
-		
-		
 		// Get the required params
 		$google_calendars_param = $this->getParam( "google_calendars" );
 		$this->user = $this->getParam( "user" );
 		$this->password = $this->getParam( "password" );
 		$num_days = $this->getParam( "num_days" );
-		if ( !$google_calendars_param || !$this->user || !$this->password || !$num_days ) {
-			$this->log("pi.googlecal_events error - insufficient input given.");
+		if ( $google_calendars_param == '' || $this->user == '' ||
+		     $this->password == '' || $num_days == '' ) 
+		{
+			$this->log( "Error: Not enough params specified, exiting (pi.googlecal_events).");
 			$this->return_data = '';
-			return;
+			return FALSE;
 		}
 		
+		// Convert the comma-
 		$this->google_calendars = explode( ',', $google_calendars_param );
 		
 		
@@ -107,18 +117,22 @@ class Googlecal_events {
 		
 		
 		// Get the optional params
-		$this->max_cache_age = $this->getParamOrDefault( "max_cache_age", Googlecal_events::DEFAULT_MAX_CACHE_AGE );
-		$this->log( "max_cache_age param = " . $this->getParamOrDefault( "max_cache_age", "nada") );
+		$this->max_cache_age = $this->getParamOrDefault( "max_cache_age", 
+			Googlecal_events::DEFAULT_MAX_CACHE_AGE );
+		
+		return TRUE;
 	}
 	
 	
 	// Get a {googlecal_events} param, or return the defaultValue if not present
 	function getParamOrDefault($paramName, $defaultValue) {
 		global $TMPL;
-		$param = $TMPL->fetch_param( $paramName );
-		// $this->log( "getParam(" . $paramName . ") = " . $param );
-		if ($param == FALSE) { $param = $defaultValue; }
-		return $param;
+		
+		if ( ! isset($TMPL->tagparams[$paramName]) ) {
+			return $defaultValue;
+		}
+		
+		return $TMPL->tagparams[$paramName];
 	}
 	
 	
@@ -138,14 +152,17 @@ class Googlecal_events {
 	
 	// Load the events from the google calendars
 	function loadEvents() {
-
+		
+		// Try to read the events from a cached file
 		$this->readCachedEvents();
 		if ( $this->events ) {
 			return;
 		}
 		
 		$this->loadEventsFromFeed();
-		$this->writeEventsToCache();
+		if ( $this->events ) {
+			$this->writeEventsToCache();
+		}
 	}
 
 	
@@ -182,8 +199,9 @@ class Googlecal_events {
 		$service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
 		try {
 			$client = Zend_Gdata_ClientLogin::getHttpClient($this->user, $this->password, $service);
-		} catch (Exception $ex) {
-			$this->log( "pi.googlecal_events, caught this trying to create a google data api client: " . $ex->getMessage() );
+		} 
+		catch (Exception $ex) {
+			$this->log( "Error: Caught this creating a Gdata client (pi.googlecal_events) : " . $ex.getMessage() );
 			return;
 		}
 		
@@ -202,8 +220,9 @@ class Googlecal_events {
 			
 			try {
 				$eventFeed = $calendar->getCalendarEventFeed( $query );
-			} catch (Exception $ex) {
-				$this->log( "pi.googlecal_events, caught this trying to get the calendar feed: " . $ex->getMessage() );
+			} 
+			catch (Exception $ex) {
+				$this->log( "Error: Caught this retrieving the Google Calendar feed (pi.googlecal_events) : " . $ex.getMessage() );
 				return;
 			}
 			
@@ -220,6 +239,8 @@ class Googlecal_events {
 	// Read the events from a file cache
 	function readCachedEvents() {
 		
+		
+		
 		if ( ! is_dir($this->cacheDir) ) {
 			return;
 		}
@@ -234,12 +255,9 @@ class Googlecal_events {
 			return;
 		}
 		
-		$this->log("Cache age (" . $cacheAge . ") is not bigger than " . $this->max_cache_age);
-		
-
 		$fp = fopen($cacheFileName, "rb");
 		if ( ! $fp ) {
-			$this->log( "pi.googlecal_events, unable to open cache file $cacheFileName for some reason" );
+			$this->log( "Error: Unable to open cache file for reading (pi.googlecal_events).");
 			return;
 		}
 
@@ -257,7 +275,7 @@ class Googlecal_events {
 		if ( ! is_dir($this->cacheDir) ) {
 			mkdir( $this->cacheDir );
 			if ( ! is_dir($this->cacheDir) ) {
-				$this->log( "pi.googlecal_events, unable to create cache dir " . $this->cacheDir );
+				$this->log( "Error: Unable to create cache dir " . $this->cacheDir . "  (pi.googlecal_events).");
 				return;
 			}
 		}
@@ -266,7 +284,7 @@ class Googlecal_events {
 		
 		$fp = @fopen($cacheFileName, "wb");
 		if ( ! $fp ) {
-			$this->log( "pi.googlecal_events, unable to open cache file $cacheFileName for writing." );
+			$this->log( "Error: Unable to open cache file for writing (pi.googlecal_events).");
 			return;
 		}
 
@@ -277,7 +295,7 @@ class Googlecal_events {
 		    flock($fp, LOCK_UN);
 		}
 		else {
-			$this->log( "pi.googlecal_events, unable to get a file lock writing $cacheFileName." );
+			$this->log( "Error: unable to get a lock for writing to the cache file (pi.googlecal_events).");
 		}
 
 	}
@@ -319,10 +337,6 @@ class Googlecal_events {
 		
 		global $TMPL, $LOC, $SESS;
 
-		
-		if ( $this->events == null ) {
-			return;
-		}
 		
 		$startDayToDateFormatsMap = $this->buildDateFormatTagToDateParamMap( Googlecal_events::START_DAY_FORMAT_VAR );
 		$startTimeToDateFormatsMap = $this->buildDateFormatTagToDateParamMap( Googlecal_events::START_TIME_VAR );
