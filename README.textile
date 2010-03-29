@@ -1,5 +1,7 @@
 h1. Google Calendar Events plugin for ExpressionEngine
 
+*Google Calendar Events* is a plugin for the "ExpressionEngine":http://www.expressionengine.com/ Content Management System that provides a new {exp:googlecal_events} tag for your templates.
+
 The {exp:googlecal_events} tag displays a list of upcoming events from one or more Google Calendars in your web site. This makes it possible to take advantage of the superior editing and time management features of Google Calendar while displaying these scheduled and/or recurring events in your own style on your site.
 
 Requires the free "Zend Gdata package":http://framework.zend.com/download/gdata and a working Google account to use. This plugin has been tested with ExpressionEngine 1.6.8.
@@ -11,8 +13,7 @@ h2. Installation
 
 h2. Parameters
 
-The {exp:googlecal_events} tag takes the following parameters
-|_. Name|_. DESCRIPTION|
+|_. Name|_. Description|
 |google_calendars|The Google Calendar id (eg "12345@group.calendar.google.com") or a comma-delimited list of id's.|
 |user|The username of your Google account (your Gmail address should work here).|
 |password|The password of your Google account.|
@@ -22,35 +23,37 @@ The {exp:googlecal_events} tag takes the following parameters
 
 h2. Single Variables
 
-{start_time format="%Y %m %d"}
-    The start time of the event
-{end_time format="%Y %m %d"}
-    The end time of the event
-{what}
-    The title of the event (from the "what" field in Google Calendar)
-{where}
-    The location of the event (from the "where" field in Google Calendar)
-{description}
-    The description of the event (from the "description" field in Google Calendar)
+|_. Name|_. Description|
+|{start_time format="%Y %m %d"}|The start time of the event. Uses ExpressionEngine's "Date Variable Formatting":http://expressionengine.com/docs/templates/date_variable_formatting.html |
+|{end_time format="%Y %m %d"}|The end time of the event. Uses ExpressionEngine's "Date Variable Formatting":http://expressionengine.com/docs/templates/date_variable_formatting.html |
+|{what}|The title of the event (from the "what" field in Google Calendar)|
+|{where}|The location of the event (from the "where" field in Google Calendar)|
+|{description}|The description of the event (from the "description" field in Google Calendar)|
 
 
 h2. Variable Pairs
 
-{start_day} {start_day_format format="%Y %m %d"} {/start_day}
-    The start time of the event, only displayed for the first event each day
+|_. Name|_. Description|
+|{start_day}<br>  {start_day_format<br>    format="%Y %m %d"}<br>{/start_day}|The start time of the event, only displayed for the first event each day. Uses ExpressionEngine's "Date Variable Formatting":http://expressionengine.com/docs/templates/date_variable_formatting.html . This makes it possible to create a Date header that appears above all of the events for that day. |
 
 
 h2. Example 1 - Simple List Of Events
 
-@{exp:googlecal_events google_calendars="<cal>" user="<user>" password="<password>" num_days="14" }
+bc. {exp:googlecal_events google_calendars="<cal>" user="<user>" 
+    password="<password>" num_days="14" }
     {start_time format="%g:%i %a"}: {what} ({where})<br>
-{/exp:googlecal_events}@
+{/exp:googlecal_events}
 
+ 
 h2. Example 2 - TV Shows This Week
 
-{exp:googlecal_events google_calendars="3t2brro1crmt94uuqomrgipqiulm7fs7@import.calendar.google.com"
-    user="<user>" password="<password>" num_days="7" }
-    {start_day}<div style="font: bold 14px Verdana;">{start_day_format format="%l, %M %j %Y"}</div>{/start_day}
+bc. {exp:googlecal_events 
+    google_calendars="3t2brro1crmt94uuqomrgipqiulm7fs7@import.calendar.google.com"
+    user="<user>" password="<password>" num_days="7" 
+}
+    {start_day}<div style="font: bold 14px Verdana;">
+        {start_day_format format="%l, %M %j %Y"}
+    </div>{/start_day}
     {start_time format="%g:%i %a"} - {what} <br>
     <div style="margin: 0 4em 1em 4em;">{description}</div>
 {/exp:googlecal_events}
