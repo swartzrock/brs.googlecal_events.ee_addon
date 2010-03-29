@@ -59,7 +59,7 @@ class Googlecal_events {
 		// Load the Zend Google Data API
 		include_once 'Zend/Loader.php';
 		if( ! class_exists("Zend_Loader") ) {
-			$this->log( "Error: Zend GData API not found, unable to load events (pi.googlecal_events).");
+			$this->log( "Error: Zend Gdata API not found, unable to load events (pi.googlecal_events).");
 			return;
 		}
 		
@@ -201,7 +201,7 @@ class Googlecal_events {
 			$client = Zend_Gdata_ClientLogin::getHttpClient($this->user, $this->password, $service);
 		} 
 		catch (Exception $ex) {
-			$this->log( "Error: Caught this creating a Gdata client (pi.googlecal_events) : " . $ex.getMessage() );
+			$this->log( "Error: Caught this creating a Gdata client (pi.googlecal_events) : " . $ex->getMessage() );
 			return;
 		}
 		
@@ -222,7 +222,7 @@ class Googlecal_events {
 				$eventFeed = $calendar->getCalendarEventFeed( $query );
 			} 
 			catch (Exception $ex) {
-				$this->log( "Error: Caught this retrieving the Google Calendar feed (pi.googlecal_events) : " . $ex.getMessage() );
+				$this->log( "Error: Caught this retrieving the Google Calendar feed (pi.googlecal_events) : " . $ex->getMessage() );
 				return;
 			}
 			
@@ -464,94 +464,57 @@ class Googlecal_events {
 	{
 		ob_start(); 
 		
-?>------------------
-DESCRIPTION
-------------------
-The {exp:googlecal_events} tag.... ... .. TBD
+?>
+
+# Description
+The {exp:googlecal_events} tag displays a list of upcoming events in chronological order from one or more Google Calendars. Requres the free Zend Gdata package (http://framework.zend.com/download/gdata) and a working Google account to use.
 
 
-------------------
-PARAMETERS
-------------------
+# Parameters
 google_calendars
-- The google calendars to display, formatted as a comma-delimited list of calendar id's.
-- Example: google_calendars="12345@group.calendar.google.com,67890@group.calendar.google.com"
-
-user = ""
-- The user id of the Google API-Enabled account to use
-- Example: gdataApiUser@gmail.com
-
-password = ""
-- The password of the Google API-Enabled account to use
-
-num_days = ""
-- The number of days to display, starting from the current date.
-
-max_cache_age = ""  [OPTIONAL]
-- The maximum time in seconds to cache the calendar feed locally
-- If not specified, the default time of 15 minutes will be used
+    The Google Calendar id (eg "12345@group.calendar.google.com") or a comma-delimited list of id's.
+user
+    The username of your Google account (your Gmail address should work here).
+password
+    The password of your Google account.
+num_days
+    The number of days to display
+max_cache_age [optional]
+    The maximum age in seconds of the local file cache for the events. If not specified, the default value of 900 (15 minutes) will be used.
 
 
-		------------------
-		EXAMPLE USAGE:
-		------------------
-		{exp:googlecal_events google_calendars="..." user="..." password="..." num_days="..." }
-		{start_time format="%g:%i %a"}: {what} ({where})<br>
-		{/exp:googlecal_events}
-		
-		{exp:googlecal_events google_calendars="..." user="..." password="..." num_days="..." }
-		{start_day}<div class="day">{start_day_format format="%l, %F %j %Y"}</div>{/start_day}
-		{start_time format="%g:%i %a"}: {what} ({where})<br>
-		{description}<br>
-		{/exp:googlecal_events}
-		
-		------------------
-		PARAMETERS:
-		------------------
-		google_calendars=""
-		- The google calendars to display, formatted as a comma-delimited list of calendar id's.
-		- Example: google_calendars="db6v89hrjqi72ht6mjfcacij80@group.calendar.google.com"
-		- Example: google_calendars="db6v89hrjqi72ht6mjfcacij80@group.calendar.google.com,5aa42b61ffhjubloa703tkes48@group.calendar.google.com"
-		
-		
-		user = ""
-		- The user id of the Google API-Enabled account to use
-		- Example: gdataApiUser@gmail.com
-		
-		password = ""
-		- The password of the Google API-Enabled account to use
-		
-		num_days = ""
-		- The number of days to display, starting from the current date.
-		
-		max_cache_age = ""  [OPTIONAL]
-		- The maximum time in seconds to cache the calendar feed locally
-		- If not specified, the default time of 15 minutes will be used
-		
-		------------------
-		VARIABLES:
-		------------------
-		{start_day format="<date format tags>"}
-		- Displays the start time of the event formatted using EE date tags
-		- Only appears once a day for the first event each day
-		- Makes it possible to show a single Day header for multiple events (see second example above)
-		
-		{start_time format="<date format tags>"}
-		- Displays the start time of the event formatted using EE date tags
-		- Unlike start_day, appears for every event
-		- Example: use start_day to show the date and start_time to show the start time
-		
-		{end_time format="<date format tags>"}
-		- Displays the end time of the event formatted using EE date tags
-		
-		{what}
-		- Displays the "what" field of the event, aka the event title
-		
-		{where}
-		- Displays the "where" field of the event
-		
-		{description}
-		- Displays the full description of the event
+# Single Variables
+{start_time format="%Y %m %d"}
+    The start time of the event
+{end_time format="%Y %m %d"}
+    The end time of the event
+{what}
+    The title of the event (from the "what" field in Google Calendar)
+{where}
+    The location of the event (from the "where" field in Google Calendar)
+{description}
+    The description of the event (from the "description" field in Google Calendar)
+
+
+# Variable Pairs
+{start_day} {start_day_format format="%Y %m %d"} {/start_day}
+    The start time of the event, only displayed for the first event each day
+
+
+# Example 1 - Simple List Of Events
+{exp:googlecal_events google_calendars="<cal>" user="<user>" password="<password>" num_days="14" }
+    {start_time format="%g:%i %a"}: {what} ({where})<br>
+{/exp:googlecal_events}
+
+
+# Example 2 - TV Shows This Week
+{exp:googlecal_events google_calendars="3t2brro1crmt94uuqomrgipqiulm7fs7@import.calendar.google.com" 
+    user="<user>" password="<password>" num_days="7" }
+    {start_day}<div style="font: bold 14px Verdana;">{start_day_format format="%l, %M %j %Y"}</div>{/start_day}
+    {start_time format="%g:%i %a"} - {what} <br>
+    <div style="margin: 0 4em 1em 4em;">{description}</div>
+{/exp:googlecal_events}
+
 
 		<?php
 		$buffer = ob_get_flush();
