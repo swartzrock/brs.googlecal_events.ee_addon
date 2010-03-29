@@ -1,4 +1,3 @@
-
 Home Page for the ExpressionEngine plugin "pi.googlecal_events.php"
 
 h2. Description
@@ -44,8 +43,7 @@ h2. Example 1 - Simple List Of Events
 
 @{exp:googlecal_events google_calendars="<cal>" user="<user>" password="<password>" num_days="14" }
     {start_time format="%g:%i %a"}: {what} ({where})<br>
-{/exp:googlecal_events}
-@
+{/exp:googlecal_events}@
 
 h2. Example 2 - TV Shows This Week
 
