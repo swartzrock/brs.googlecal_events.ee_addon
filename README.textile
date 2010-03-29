@@ -1,5 +1,26 @@
 Home Page for the ExpressionEngine plugin "pi.googlecal_events.php"
 
+h1. h1 
+
+h2. h1 
+
+h3. h1 
+
+h4. h1 
+
+h5. h1 
+
+_emphasis_
+*strong*
+__italic__ **bold** ??citation??
+-deleted text-
++inserted text+
+^superscript^
+~subscript~
+%span%
+@code@
+
+
 h2. Description
 
 The {exp:googlecal_events} tag displays a list of upcoming events in chronological order from one or more Google Calendars. Requres the free Zend Gdata package (http://framework.zend.com/download/gdata) and a working Google account to use.
