@@ -1,0 +1,52 @@
+
+Home Page for the ExpressionEngine plugin "pi.googlecal_events.php"
+
+h2. Description
+The {exp:googlecal_events} tag displays a list of upcoming events in chronological order from one or more Google Calendars. Requres the free Zend Gdata package (http://framework.zend.com/download/gdata) and a working Google account to use.
+
+
+h2. Parameters
+google_calendars
+    The Google Calendar id (eg "12345@group.calendar.google.com") or a comma-delimited list of id's.
+user
+    The username of your Google account (your Gmail address should work here).
+password
+    The password of your Google account.
+num_days
+    The number of days to display
+max_cache_age [optional]
+    The maximum age in seconds of the local file cache for the events. If not specified, the default value of 900 (15 minutes) will be used.
+
+
+h2. Single Variables
+{start_time format="%Y %m %d"}
+    The start time of the event
+{end_time format="%Y %m %d"}
+    The end time of the event
+{what}
+    The title of the event (from the "what" field in Google Calendar)
+{where}
+    The location of the event (from the "where" field in Google Calendar)
+{description}
+    The description of the event (from the "description" field in Google Calendar)
+
+
+h2. Variable Pairs
+{start_day} {start_day_format format="%Y %m %d"} {/start_day}
+    The start time of the event, only displayed for the first event each day
+
+
+h2. Example 1 - Simple List Of Events
+{exp:googlecal_events google_calendars="<cal>" user="<user>" password="<password>" num_days="14" }
+    {start_time format="%g:%i %a"}: {what} ({where})<br>
+{/exp:googlecal_events}
+
+
+h2. Example 2 - TV Shows This Week
+{exp:googlecal_events google_calendars="3t2brro1crmt94uuqomrgipqiulm7fs7@import.calendar.google.com"
+    user="<user>" password="<password>" num_days="7" }
+    {start_day}<div style="font: bold 14px Verdana;">{start_day_format format="%l, %M %j %Y"}</div>{/start_day}
+    {start_time format="%g:%i %a"} - {what} <br>
+    <div style="margin: 0 4em 1em 4em;">{description}</div>
+{/exp:googlecal_events}
+
