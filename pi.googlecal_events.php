@@ -4,7 +4,7 @@ $plugin_info = array(
 	'pi_name'			=> 'Google Calendar Events',
 	'pi_version'		=> '1.0',
 	'pi_author'			=> 'Jason Swartz',
-	'pi_author_url'		=> 'http://blackrocksoftware.com/',
+	'pi_author_url'		=> 'https://github.com/swartzrock/brs.googlecal_events.ee_addon/',
 	'pi_description'	=> 'Displays feed of events from Google Calendars',
 	'pi_usage'			=> Googlecal_events::usage()
 );
