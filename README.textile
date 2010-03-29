@@ -1,43 +1,23 @@
-Home Page for the ExpressionEngine plugin "pi.googlecal_events.php"
+h1. Google Calendar Events plugin for ExpressionEngine
 
-h1. h1 
+The {exp:googlecal_events} tag displays a list of upcoming events from one or more Google Calendars in your web site. This makes it possible to take advantage of the superior editing and time management features of Google Calendar while displaying these scheduled and/or recurring events in your own style on your site.
 
-h2. h1 
+Requires the free "Zend Gdata package":http://framework.zend.com/download/gdata and a working Google account to use. This plugin has been tested with ExpressionEngine 1.6.8.
 
-h3. h1 
+h2. Installation
 
-h4. h1 
-
-h5. h1 
-
-_emphasis_
-*strong*
-__italic__ **bold** ??citation??
--deleted text-
-+inserted text+
-^superscript^
-~subscript~
-%span%
-@code@
-
-
-h2. Description
-
-The {exp:googlecal_events} tag displays a list of upcoming events in chronological order from one or more Google Calendars. Requres the free Zend Gdata package (http://framework.zend.com/download/gdata) and a working Google account to use.
-
+# "Download":http://framework.zend.com/download/gdata the Zend Gdata package and install the *Zend* library in a directory in your PHP Include Path.
+# Download this plugin to your site's System/Plugins directory.
 
 h2. Parameters
 
-google_calendars
-    The Google Calendar id (eg "12345@group.calendar.google.com") or a comma-delimited list of id's.
-user
-    The username of your Google account (your Gmail address should work here).
-password
-    The password of your Google account.
-num_days
-    The number of days to display
-max_cache_age [optional]
-    The maximum age in seconds of the local file cache for the events. If not specified, the default value of 900 (15 minutes) will be used.
+The {exp:googlecal_events} tag takes the following parameters
+|_. Name|_. DESCRIPTION|
+|google_calendars|The Google Calendar id (eg "12345@group.calendar.google.com") or a comma-delimited list of id's.|
+|user|The username of your Google account (your Gmail address should work here).|
+|password|The password of your Google account.|
+|num_days|The number of days to display|
+|max_cache_age [optional]|The maximum age in seconds of the local file cache for the events. If not specified, the default value of 900 (15 minutes) will be used.|
 
 
 h2. Single Variables
