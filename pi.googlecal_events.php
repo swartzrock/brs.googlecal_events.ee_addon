@@ -21,6 +21,7 @@ $plugin_info = array(
 class Googlecal_events {
 	
 	const DEFAULT_MAX_CACHE_AGE 		= 900; // default: cache events for 15 minutes
+	const DEFAULT_MAX_EVENTS	 		= 30; // default: cache events for 15 minutes
 	const CACHE_DIR_NAME				= "googlecal_events_cache";
 	
 	const START_DAY_VAR 				= "start_day";
@@ -37,6 +38,7 @@ class Googlecal_events {
 	var $user;
 	var $password;
 	var $max_cache_age;
+	var $max_events;
 	
 	
 	// Other things
@@ -82,6 +84,9 @@ class Googlecal_events {
 			return;
 		}
 		
+		// Trim the events as requested
+		$this->events = array_slice( $this->events, 0, $this->max_events );
+		
 		$this->renderEvents();
 	}
 	
@@ -119,6 +124,9 @@ class Googlecal_events {
 		// Get the optional params
 		$this->max_cache_age = $this->getParamOrDefault( "max_cache_age", 
 			Googlecal_events::DEFAULT_MAX_CACHE_AGE );
+		$this->max_events = $this->getParamOrDefault( "max_events", 
+			Googlecal_events::DEFAULT_MAX_EVENTS );
+		
 		
 		return TRUE;
 	}
@@ -163,6 +171,7 @@ class Googlecal_events {
 		if ( $this->events ) {
 			$this->writeEventsToCache();
 		}
+		
 	}
 
 	
@@ -238,8 +247,6 @@ class Googlecal_events {
 	
 	// Read the events from a file cache
 	function readCachedEvents() {
-		
-		
 		
 		if ( ! is_dir($this->cacheDir) ) {
 			return;
@@ -517,7 +524,7 @@ max_cache_age [optional]
 
 
 		<?php
-		$buffer = ob_get_flush();
+		$buffer = ob_get_contents();
 
 		ob_end_clean(); 
 
