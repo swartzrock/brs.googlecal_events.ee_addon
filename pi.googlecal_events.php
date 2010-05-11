@@ -488,6 +488,8 @@ num_days
     The number of days to display
 max_cache_age [optional]
     The maximum age in seconds of the local file cache for the events. If not specified, the default value of 900 (15 minutes) will be used.
+max_events [optional]
+    Limit the number of items to next n entries. If not specified, the default maximum value of 30 events will be used.
 
 
 # Single Variables
