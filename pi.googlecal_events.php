@@ -173,20 +173,68 @@ class Googlecal_events {
 		}
 		
 	}
+	
+	
+	// Remove events that have been deleted or cancelled from the list of events
+	function removeCancelledEvents($eventFeed) {
+		
+		$filteredEvents = array();
+		
+		
+		foreach ($eventFeed as $event) {
+			
+			// Ignore events with cancelled status
+			if ( $event->eventStatus == "http://schemas.google.com/g/2005#event.canceled" ) {
+				continue;
+			}
+			
+			// Save the start time of the current event
+			$curEventStart = $event->when[0]->startTime;
+			
+			// Find cancelled events for this recurring event (if it is recurring)
+			$cancelledEventStartTimes = array();
+			foreach ($event->recurrenceException as $recurrenceException) {
+				
+				// Not happening? Continue...
+				if ( count($event->when) == 0 ) { 
+					continue;
+				}
+				
+				// Parse the xml of this entry and get its start time
+				$xmlString = $recurrenceException->entryLink->entry->getXml();
+				$xmlString = str_replace('xmlns=', 'ns=', $xmlString);
+				$xml = simplexml_load_string( $xmlString );
+				$when  = $xml->xpath('//atom:entry/when');
+				$startTime = (string) $when[0]['startTime'][0];
+				$cancelledEventStartTimes[] = $startTime;
+			}
+			
+			// This event's start time is in a list of exceptions, skip it!
+			if ( in_array($curEventStart, $cancelledEventStartTimes) ) {
+				continue;
+			}
+			
+			// Add this event to the result
+			$filteredEvents[] = $event;
+			
+		}
+		
+		return $filteredEvents;
+		
+		
+	}
+	
 
 	
 	// Parse the event feed from the Gdata API
 	function parseEventFeed($eventFeed) {
 		
+		// Remove any cancelled events
+		$eventFeed = $this->removeCancelledEvents( $eventFeed );
+		
 		$events = array();
 		
 		foreach ($eventFeed as $event) {
-			
-			// Ignore cancelled events
-			if ( $event->eventStatus == "http://schemas.google.com/g/2005#event.canceled" ) {
-				continue;
-			}
-			
 			$name = $event->title;
 			$where = $event->where[0];
 			$description = $event->content;
@@ -217,7 +265,7 @@ class Googlecal_events {
 		$calendar = new Zend_Gdata_Calendar($client);
 		$query = $calendar->newEventQuery();
 		$query->setVisibility('private');
-		$query->setProjection('full');
+		$query->setProjection('composite');
 		$query->setStartMin($this->calendar_start_date);
 		$query->setStartMax($this->calendar_end_date);
 		
@@ -354,6 +402,11 @@ class Googlecal_events {
 		$output = "";
 		
 		foreach( $this->events as $event ) {
+			
+			if ( $event->name == "Kabbalat Shabbat Services" && $event->startTime == 1273886100 ) {
+				continue;
+			}
+			
 			
 			$isAllDayEvent = ($LOC->decode_date('%H%i', $event->startTime, false) == '0000');
 			
