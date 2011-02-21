@@ -2,7 +2,7 @@
 
 $plugin_info = array(
 	'pi_name'			=> 'Google Calendar Events',
-	'pi_version'		=> '1.0',
+	'pi_version'		=> 'v1.2',
 	'pi_author'			=> 'Jason Swartz',
 	'pi_author_url'		=> 'https://github.com/swartzrock/brs.googlecal_events.ee_addon/',
 	'pi_description'	=> 'Displays feed of events from Google Calendars',
@@ -402,11 +402,6 @@ class Googlecal_events {
 		$output = "";
 		
 		foreach( $this->events as $event ) {
-			
-			if ( $event->name == "Kabbalat Shabbat Services" && $event->startTime == 1273886100 ) {
-				continue;
-			}
-			
 			
 			$isAllDayEvent = ($LOC->decode_date('%H%i', $event->startTime, false) == '0000');
 			
